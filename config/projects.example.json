@@ -1,0 +1,41 @@
+{
+  "baseDirs": {
+    "win32": "C:\\repos",
+    "darwin": "~/repos",
+    "linux": "~/repos"
+  },
+  "projects": [
+    {
+      "id": "my-app",
+      "name": "My App",
+      "path": "my-app",
+      "description": "Example full-stack project",
+      "services": [
+        {
+          "id": "frontend",
+          "name": "Frontend",
+          "cwd": "frontend",
+          "command": "npm run dev",
+          "port": 5173,
+          "url": "http://localhost:5173",
+          "health": { "type": "http", "url": "http://127.0.0.1:5173/" }
+        },
+        {
+          "id": "backend",
+          "name": "Backend",
+          "cwd": "backend",
+          "command": "npm run dev",
+          "port": 3000,
+          "health": { "type": "http", "url": "http://127.0.0.1:3000/health" }
+        },
+        {
+          "id": "worker",
+          "name": "Worker",
+          "cwd": "worker",
+          "command": { "win32": "npm run dev", "darwin": "npm run dev" },
+          "health": { "type": "process", "match": "worker/dist/worker.js" }
+        }
+      ]
+    }
+  ]
+}

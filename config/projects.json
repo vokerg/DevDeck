@@ -1,0 +1,45 @@
+{
+  "baseDirs": {
+    "win32": "C:\\repos",
+    "darwin": "~/repos",
+    "linux": "~/repos"
+  },
+  "projects": [
+    {
+      "id": "devdeck",
+      "name": "DevDeck",
+      "path": "DevDeck",
+      "description": "Your local development flight deck",
+      "services": [
+        {
+          "id": "dashboard",
+          "name": "Dashboard",
+          "cwd": ".",
+          "command": "npm run dev",
+          "url": "http://localhost:4400",
+          "port": 4400,
+          "health": { "type": "http", "url": "http://127.0.0.1:4400/api/health" }
+        }
+      ]
+    },
+    {
+      "id": "chess-trainer",
+      "name": "Chess Repertoire Trainer",
+      "path": "chess_repertoir_trainer",
+      "description": "Add your frontend, backend and worker services in config/projects.json",
+      "services": []
+    },
+    {
+      "id": "garmin-heatmap",
+      "name": "Garmin Heatmap",
+      "path": "GarminHeatmap",
+      "services": []
+    },
+    {
+      "id": "voktrader",
+      "name": "Voktrader",
+      "path": "voktrader",
+      "services": []
+    }
+  ]
+}

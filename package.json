@@ -1,0 +1,15 @@
+{
+  "name": "devdeck",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local flight deck for development projects",
+  "scripts": {
+    "dev": "node --watch server/index.js",
+    "start": "node server/index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
