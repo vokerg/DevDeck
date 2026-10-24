@@ -6,36 +6,236 @@
   },
   "projects": [
     {
-      "id": "my-app",
-      "name": "My App",
-      "path": "my-app",
-      "description": "Example full-stack project",
+      "id": "devdeck",
+      "name": "DevDeck",
+      "path": "DevDeck",
+      "description": "Flight control dashboard",
+      "services": [
+        {
+          "id": "dashboard",
+          "name": "Dashboard",
+          "role": "frontend",
+          "cwd": ".",
+          "command": "npm run dev",
+          "port": 4400,
+          "url": "http://localhost:4400",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:4400/api/health"
+          }
+        }
+      ]
+    },
+    {
+      "id": "nba-time-machine",
+      "name": "NBA Time Machine",
+      "path": "nba_time_machine",
+      "description": "Vite + Python/FastAPI, with a macOS combined launcher",
       "services": [
         {
           "id": "frontend",
           "name": "Frontend",
+          "role": "frontend",
           "cwd": "frontend",
           "command": "npm run dev",
           "port": 5173,
           "url": "http://localhost:5173",
-          "health": { "type": "http", "url": "http://127.0.0.1:5173/" }
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:5173/",
+            "contains": "<title>NBA Time Machine</title>"
+          }
         },
         {
           "id": "backend",
           "name": "Backend",
+          "role": "backend",
           "cwd": "backend",
-          "command": "npm run dev",
+          "command": {
+            "win32": ".\\.venv\\Scripts\\python.exe -m uvicorn nba_time_machine.main:app --reload",
+            "darwin": "./.venv/bin/python -m uvicorn nba_time_machine.main:app --reload",
+            "linux": "./.venv/bin/python -m uvicorn nba_time_machine.main:app --reload"
+          },
+          "port": 8000,
+          "url": "http://127.0.0.1:8000/docs",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:8000/openapi.json"
+          }
+        }
+      ],
+      "launchers": [
+        {
+          "id": "all",
+          "name": "Frontend + Backend",
+          "cwd": ".",
+          "command": {
+            "darwin": "python3 dev.py",
+            "linux": "python3 dev.py"
+          },
+          "services": [
+            "frontend",
+            "backend"
+          ],
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "why-i-suck-at-chess",
+      "name": "Why I Suck at Chess",
+      "path": "WhyISuckAtChess",
+      "description": "Angular + Fastify + persistent analysis worker",
+      "services": [
+        {
+          "id": "frontend",
+          "name": "Frontend",
+          "role": "frontend",
+          "cwd": ".",
+          "command": "npm run dev:web",
+          "port": 4200,
+          "url": "http://localhost:4200",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:4200/",
+            "contains": "<title>Why I Suck at Chess</title>"
+          }
+        },
+        {
+          "id": "backend",
+          "name": "Backend",
+          "role": "backend",
+          "cwd": ".",
+          "command": "npm run dev:api",
           "port": 3000,
-          "health": { "type": "http", "url": "http://127.0.0.1:3000/health" }
+          "url": "http://localhost:3000/health",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:3000/health"
+          }
         },
         {
           "id": "worker",
           "name": "Worker",
-          "cwd": "worker",
-          "command": { "win32": "npm run dev", "darwin": "npm run dev" },
-          "health": { "type": "process", "match": "worker/dist/worker.js" }
+          "role": "worker",
+          "cwd": ".",
+          "command": "npm run dev:worker",
+          "health": {
+            "type": "process",
+            "match": "src/worker.ts",
+            "cwd": true
+          }
+        }
+      ],
+      "launchers": [
+        {
+          "id": "web-api",
+          "name": "Web + API",
+          "command": "npm run dev",
+          "services": [
+            "frontend",
+            "backend"
+          ]
+        },
+        {
+          "id": "all",
+          "name": "Full stack + worker",
+          "command": "npm run dev:all",
+          "services": [
+            "frontend",
+            "backend",
+            "worker"
+          ],
+          "preferred": true
         }
       ]
+    },
+    {
+      "id": "chess-repertoire-trainer",
+      "name": "Chess Repertoire Trainer",
+      "path": "chess_repertoir_trainer",
+      "description": "Angular + Fastify + persistent worker; optional Expo",
+      "services": [
+        {
+          "id": "frontend",
+          "name": "Frontend",
+          "role": "frontend",
+          "cwd": ".",
+          "command": "npm run dev:web",
+          "port": 4200,
+          "url": "http://localhost:4200",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:4200/",
+            "contains": "<title>Chess Repertoire Trainer</title>"
+          }
+        },
+        {
+          "id": "backend",
+          "name": "Backend",
+          "role": "backend",
+          "cwd": ".",
+          "command": "npm run dev:api",
+          "port": 3000,
+          "url": "http://localhost:3000/api/docs",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:3000/api/docs/openapi.json"
+          }
+        },
+        {
+          "id": "worker",
+          "name": "Worker",
+          "role": "worker",
+          "cwd": ".",
+          "command": "npm run dev:worker",
+          "health": {
+            "type": "process",
+            "match": "src/worker.ts",
+            "cwd": true
+          }
+        },
+        {
+          "id": "mobile",
+          "name": "Mobile / Expo",
+          "role": "mobile",
+          "cwd": ".",
+          "command": "npm run dev:mobile",
+          "port": 8081,
+          "url": "http://localhost:8081",
+          "health": {
+            "type": "tcp",
+            "port": 8081
+          },
+          "autostart": false
+        }
+      ],
+      "launchers": [
+        {
+          "id": "web-api",
+          "name": "Web + API",
+          "command": "npm run dev",
+          "services": [
+            "frontend",
+            "backend"
+          ],
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "garmin-heatmap",
+      "name": "Garmin Heatmap",
+      "path": "GarminHeatmap",
+      "description": "Not configured yet",
+      "services": []
+    },
+    {
+      "id": "voktrader",
+      "name": "Voktrader",
+      "path": "voktrader",
+      "description": "Not configured yet",
+      "services": []
     }
   ]
 }
