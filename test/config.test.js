@@ -39,7 +39,7 @@ test('health URL must stay local', async () => {
 test('OS-specific commands and safe working directories', () => {
   assert.equal(commandForPlatform({ win32: 'npm run dev', darwin: 'pnpm dev' }, 'darwin'), 'pnpm dev');
   assert.equal(commandForPlatform({ win32: 'npm run dev' }, 'linux'), null);
-  assert.equal(getServiceCwd('/repos/one', { cwd: 'src' }), '/repos/one/src');
+  assert.equal(getServiceCwd('/repos/one', { cwd: 'src' }), path.resolve('/repos/one/src'));
   assert.throws(() => getServiceCwd('/repos/one', { cwd: '../other' }), /stay inside/);
 });
 
@@ -76,4 +76,19 @@ test('rejects working directories outside the repo on either operating system', 
     sample.projects[0].services[0].cwd = cwd;
     await withConfig(sample, async file => assert.rejects(loadConfig(file), /stay inside the repository/));
   }
+});
+
+test('bundled registry keeps priority projects first and validates their launch profiles', async () => {
+  const config = await loadConfig(path.resolve('config/projects.json'));
+  assert.deepEqual(config.projects.slice(0, 5).map(project => project.id), [
+    'personal-context-engine',
+    'sportos',
+    'nba-time-machine',
+    'why-i-suck-at-chess',
+    'chess-repertoire-trainer'
+  ]);
+  assert.deepEqual(config.projects.slice(0, 2).map(project => project.launchers[0].services), [
+    ['web', 'api'],
+    ['web', 'api', 'worker']
+  ]);
 });

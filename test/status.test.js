@@ -24,6 +24,15 @@ test('HTTP check confirms healthy endpoints', async () => {
   await withServer(http.createServer((req, res) => { res.writeHead(200); res.end('OK'); }), async (port) => {
     const state = await probeService({ port, health: { type: 'http', url: `http://127.0.0.1:${port}/health` } });
     assert.equal(state.status, 'running');
+    assert.match(state.detail, /identity not verified/);
+  });
+});
+
+test('HTTP signature reports verified ownership in the service detail', async () => {
+  await withServer(http.createServer((req, res) => { res.writeHead(200); res.end('{"ok":true}'); }), async (port) => {
+    const state = await probeService({ health: { type: 'http', url: `http://127.0.0.1:${port}/health`, contains: '"ok":true' } });
+    assert.equal(state.status, 'running');
+    assert.match(state.detail, /signature verified/);
   });
 });
 

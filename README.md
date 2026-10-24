@@ -18,7 +18,7 @@ npm run dev
 
 Open **http://localhost:4400**. `npm run dev` watches the Node server; `npm start` runs normally and `npm test` runs the automated tests. The server binds only to `127.0.0.1`.
 
-**First edit:** set `baseDirs.win32` and `baseDirs.darwin` in `config/projects.json` to where your repositories live on each machine. The committed configuration includes examples for DevDeck, `nba_time_machine`, `WhyISuckAtChess`, and `chess_repertoir_trainer`; it also contains unconfigured placeholders for Garmin Heatmap and Voktrader. These are *examples*, not auto-detected installations. Verify actual commands, ports and locations on each computer.
+**First edit:** set `baseDirs.win32` and `baseDirs.darwin` in `config/projects.json` to where your repositories live on each machine. The committed configuration includes examples for Personal Context Engine, SportOS, DevDeck, `nba_time_machine`, `WhyISuckAtChess`, and `chess_repertoir_trainer`; it also contains unconfigured placeholders for Garmin Heatmap and Voktrader. These are *examples*, not auto-detected installations. Verify actual commands, ports and locations on each computer.
 
 To keep machine-specific configuration out of Git, copy `config/projects.json` to `config/projects.local.json` (which is gitignored), edit it, then launch with `DEVDECK_CONFIG=config/projects.local.json npm run dev` on macOS or `$env:DEVDECK_CONFIG='config/projects.local.json'; npm run dev` in PowerShell. The dashboard does not edit configuration; changes to the JSON are picked up on the next 5-second refresh.
 
@@ -70,6 +70,8 @@ All project definitions are in a **static JSON file**. No repository scanning, g
 
 | Repository | FE | API | Worker | Launcher | Notes |
 | --- | --- | --- | --- | --- | --- |
+| `personal_context_engine` | React/Vite `:4310` | Fastify `:3110` | Optional `npm run dev:worker` | `npm run dev:local` | Local launcher requires the configured database and imports local content; worker remains manual. |
+| `sportos` | Angular `:4210` | NestJS `:3010` | `pnpm run dev:worker` | `pnpm run dev` | Full launcher loads the checked-in `.env` and starts API, worker and web together. |
 | `nba_time_machine` | Vite `:5173` | FastAPI `:8000` | — | `python3 dev.py` on macOS | Requires Python `.venv` and frontend dependencies. Windows can start FE and API individually. |
 | `WhyISuckAtChess` | Angular `:4200` | Fastify `:3000` | `npm run dev:worker` | `npm run dev:all` | `npm run dev` is a second launch profile for web+API only. |
 | `chess_repertoir_trainer` | Angular `:4200` | Fastify `:3000` | `npm run dev:worker` | `npm run dev` (web+API) | Expo `npm run dev:mobile` at `:8081` is optional/manual. |

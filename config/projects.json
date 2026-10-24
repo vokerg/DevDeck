@@ -6,23 +6,126 @@
   },
   "projects": [
     {
-      "id": "devdeck",
-      "name": "DevDeck",
-      "path": "DevDeck",
-      "description": "Flight control dashboard",
+      "id": "personal-context-engine",
+      "name": "Personal Context Engine",
+      "path": "personal_context_engine",
+      "description": "React/Vite reader, Fastify API and optional worker",
       "services": [
         {
-          "id": "dashboard",
-          "name": "Dashboard",
+          "id": "web",
+          "name": "Web",
           "role": "frontend",
           "cwd": ".",
-          "command": "npm run dev",
-          "port": 4400,
-          "url": "http://localhost:4400",
+          "command": "npm run dev:web",
+          "port": 4310,
+          "url": "http://localhost:4310",
           "health": {
             "type": "http",
-            "url": "http://127.0.0.1:4400/api/health"
+            "url": "http://127.0.0.1:4310/",
+            "contains": "<title>Personal Context Engine</title>"
           }
+        },
+        {
+          "id": "api",
+          "name": "API",
+          "role": "backend",
+          "cwd": ".",
+          "command": "npm run dev:api",
+          "port": 3110,
+          "url": "http://127.0.0.1:3110/ready",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:3110/ready",
+            "contains": "\"status\":\"ready\""
+          }
+        },
+        {
+          "id": "worker",
+          "name": "Worker",
+          "role": "worker",
+          "cwd": ".",
+          "command": "npm run dev:worker",
+          "health": {
+            "type": "process",
+            "match": "@pce/worker",
+            "cwd": true
+          },
+          "autostart": false
+        }
+      ],
+      "launchers": [
+        {
+          "id": "local",
+          "name": "Local workspace",
+          "cwd": ".",
+          "command": "npm run dev:local",
+          "services": [
+            "web",
+            "api"
+          ],
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "sportos",
+      "name": "SportOS",
+      "path": "sportos",
+      "description": "Sports data cockpit with Angular, API and worker",
+      "services": [
+        {
+          "id": "web",
+          "name": "Web",
+          "role": "frontend",
+          "cwd": ".",
+          "command": "pnpm run dev:web",
+          "port": 4210,
+          "url": "http://localhost:4210",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:4210/",
+            "contains": "<title>SportOS</title>"
+          }
+        },
+        {
+          "id": "api",
+          "name": "API",
+          "role": "backend",
+          "cwd": ".",
+          "command": "pnpm run dev:api",
+          "port": 3010,
+          "url": "http://127.0.0.1:3010/health",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:3010/health",
+            "contains": "\"service\":\"sportos-api\""
+          }
+        },
+        {
+          "id": "worker",
+          "name": "Worker",
+          "role": "worker",
+          "cwd": ".",
+          "command": "pnpm run dev:worker",
+          "health": {
+            "type": "process",
+            "match": "import-worker.js",
+            "cwd": true
+          }
+        }
+      ],
+      "launchers": [
+        {
+          "id": "all",
+          "name": "Full stack",
+          "cwd": ".",
+          "command": "pnpm run dev",
+          "services": [
+            "web",
+            "api",
+            "worker"
+          ],
+          "preferred": true
         }
       ]
     },
@@ -220,6 +323,28 @@
             "backend"
           ],
           "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "devdeck",
+      "name": "DevDeck",
+      "path": "DevDeck",
+      "description": "Flight control dashboard",
+      "services": [
+        {
+          "id": "dashboard",
+          "name": "Dashboard",
+          "role": "frontend",
+          "cwd": ".",
+          "command": "npm run dev",
+          "port": 4400,
+          "url": "http://localhost:4400",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:4400/api/health",
+            "contains": "\"ok\":true"
+          }
         }
       ]
     },

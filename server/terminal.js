@@ -11,6 +11,20 @@ export function psQuote(value) {
   return `'${String(value).replaceAll("'", "''")}'`;
 }
 
+/** PowerShell's -EncodedCommand expects UTF-16LE base64. */
+export function encodePowerShellCommand(script) {
+  return Buffer.from(String(script), 'utf16le').toString('base64');
+}
+
+/** Use cmd's start builtin so PowerShell receives a fresh visible console. */
+export function windowsTerminalArgs(script, cwd) {
+  const encoded = encodePowerShellCommand(script);
+  // Keep the root literal in the visible parent command line. Windows worker
+  // probes use that ancestry as their best available repository verification.
+  const visibleScript = `Set-Location -LiteralPath ${psQuote(cwd)}; powershell.exe -NoLogo -NoProfile -NoExit -EncodedCommand ${encoded}`;
+  return ['/d', '/c', 'start', '', 'powershell.exe', '-NoLogo', '-NoProfile', '-NoExit', '-Command', visibleScript];
+}
+
 export function makeShellCommand(cwd, command, platform = process.platform) {
   if (platform === 'win32') {
     return `Set-Location -LiteralPath ${psQuote(cwd)}${command ? `; ${command}` : ''}`;
@@ -28,7 +42,9 @@ export async function openTerminal(cwd, command = '', platform = process.platfor
   }
   if (platform === 'win32') {
     await new Promise((resolve, reject) => {
-      const child = spawn('powershell.exe', ['-NoLogo', '-NoProfile', '-NoExit', '-Command', script], {
+      // A detached child can still inherit the server's console on Windows.
+      // `start` explicitly creates a new visible console window instead.
+      const child = spawn('cmd.exe', windowsTerminalArgs(script, cwd), {
         detached: true, stdio: 'ignore', windowsHide: false
       });
       child.once('error', reject);
