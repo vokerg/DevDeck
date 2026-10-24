@@ -41,3 +41,46 @@ test('process health matches a distinctive command line', async () => {
   assert.equal(isActive('detected'), true);
   assert.equal(isActive('occupied'), false);
 });
+
+test('HTTP identity string prevents mistaking another project for the target', async () => {
+  await withServer(http.createServer((req, res) => { res.writeHead(200); res.end('<title>Chess Repertoire Trainer</title>'); }), async port => {
+    const own = await probeService({ port, health: { type: 'http', url: `http://127.0.0.1:${port}`, contains: '<title>Chess Repertoire Trainer</title>' } });
+    const other = await probeService({ port, health: { type: 'http', url: `http://127.0.0.1:${port}`, contains: '<title>Why I Suck at Chess</title>' } });
+    assert.equal(own.status, 'running');
+    assert.equal(other.status, 'occupied');
+  });
+});
+
+test('sharing a responsive port produces an ambiguous identity warning', async () => {
+  const { applyPortConflicts } = await import('../server/status.js');
+  const base = [{ id: 'frontend', status: 'running', port: 4200 }];
+  const projects = [{ id: 'a', name: 'A', exists: true, services: structuredClone(base), launchers: [] }, { id: 'b', name: 'B', exists: true, services: structuredClone(base), launchers: [] }];
+  applyPortConflicts(projects);
+  assert.equal(projects[0].status, 'attention');
+  assert.equal(projects[1].services[0].status, 'conflict');
+  assert.match(projects[0].services[0].detail, /Ownership cannot be determined/);
+});
+
+test('process cwd check does not claim workers started from another repository', async () => {
+  const dir = await import('node:fs/promises');
+  const os = await import('node:os');
+  const p = await import('node:path');
+  const root = await dir.mkdtemp(p.join(os.tmpdir(), 'devdeck-worker-'));
+  try {
+    const result = await probeService({ health: { type: 'process', match: 'worker-sample.js', cwd: true } }, [{ pid: 999999999, command: 'node worker-sample.js' }], { cwd: root, root, platform: 'linux' });
+    assert.equal(result.status, 'unknown');
+  } finally { await dir.rm(root, { recursive: true, force: true }); }
+});
+
+test('Windows ancestry identifies a worker started in a DevDeck terminal', async () => {
+  const root = 'C:\\repos\\WhyISuckAtChess';
+  const snapshot = [
+    { pid: 22, parentPid: 21, command: 'node src/worker.ts' },
+    { pid: 21, parentPid: 20, command: 'cmd.exe /d /s /c ts-node-dev' },
+    { pid: 20, parentPid: 0, command: `powershell.exe -Command Set-Location -LiteralPath '${root}'; npm run dev:worker` }
+  ];
+  const healthy = await probeService({ health: { type:'process', match:'src/worker.ts', cwd:true } }, snapshot, { root, cwd: root, platform:'win32' });
+  assert.equal(healthy.status, 'detected');
+  const ambiguous = await probeService({ health: { type:'process', match:'src/worker.ts', cwd:true } }, snapshot.slice(0,2), { root, cwd: root, platform:'win32' });
+  assert.equal(ambiguous.status, 'unknown');
+});

@@ -1,9 +1,9 @@
 {
   "name": "devdeck",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Local flight deck for development projects",
+  "description": "Native-terminal first control center for local development on macOS and Windows",
   "scripts": {
     "dev": "node --watch server/index.js",
     "start": "node server/index.js",

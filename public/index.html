@@ -13,6 +13,7 @@
   <body>
     <svg aria-hidden="true" class="icon-sprite" xmlns="http://www.w3.org/2000/svg">
       <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
       <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
       <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4m8-8 4 4-4 4m-3-13-4 14"/></symbol>
       <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="16" rx="2.5"/><path d="m7 9 3 3-3 3m6 0h4"/></symbol>
@@ -37,15 +38,15 @@
         <div class="sidebar-label">THIS MACHINE</div>
         <div class="machine-info"><span class="machine-dot"></span><span id="platform">Detecting platform…</span></div>
         <div class="side-bottom">
-          <div class="sidebar-note"><svg class="icon"><use href="#i-terminal"/></svg><div><strong>Terminal-first</strong><p>Commands run visibly in PowerShell or macOS Terminal, never hidden.</p></div></div>
-          <div class="sidebar-footer">DEVDECK / V0.1.0</div>
+          <div class="sidebar-note"><svg class="icon"><use href="#i-terminal"/></svg><div><strong>Terminal-first</strong><p>Every action opens native PowerShell or macOS Terminal. No hidden process manager.</p></div></div>
+          <div class="sidebar-footer">DEVDECK / V1.0.0</div>
         </div>
       </aside>
 
       <main class="main">
         <header class="topbar"><div class="crumb">Workspace <svg class="icon"><use href="#i-chevron"/></svg> <strong>Overview</strong></div><div class="top-actions"><span class="live-indicator"><span></span> LOCAL SESSION</span><button class="icon-button" type="button" id="refresh" title="Refresh status" aria-label="Refresh status"><svg class="icon"><use href="#i-refresh"/></svg></button></div></header>
         <div class="main-body">
-          <div class="heading"><div><div class="eyebrow">YOUR DEVELOPMENT ENVIRONMENT</div><h1>Mission Control<span class="accent">.</span></h1><p class="subtitle">One place for your repos, services, ports, and launch commands.</p></div><div class="status-meta"><span class="pulse-dot"></span><span id="updated-at">Connecting…</span></div></div>
+          <div class="heading"><div><div class="eyebrow">YOUR DEVELOPMENT ENVIRONMENT</div><h1>Mission Control<span class="accent">.</span></h1><p class="subtitle">Observe real local services. Launch explicit commands in a native terminal.</p></div><div class="status-meta"><span class="pulse-dot"></span><span id="updated-at">Connecting…</span></div></div>
 
           <section class="metrics" aria-label="Overview metrics">
             <div class="metric"><div class="metric-top"><span>Registered projects</span><span class="metric-icon"><svg class="icon"><use href="#i-folder"/></svg></span></div><div class="metric-number" id="metric-projects">—</div><div class="metric-sub">From config/projects.json</div></div>
@@ -54,7 +55,7 @@
           </section>
 
           <section class="projects-section" aria-label="Your projects">
-            <div class="section-heading"><div><h2>Projects <span class="count" id="project-count"></span></h2><p>Live status, updated every 5 seconds</p></div><div class="filter-wrap"><label class="search"><svg class="icon"><use href="#i-search"/></svg><input id="search" placeholder="Filter projects…" autocomplete="off" aria-label="Filter projects" /></label></div></div>
+            <div class="section-heading"><div><h2>Projects <span class="count" id="project-count"></span></h2><p>HTTP, TCP and process checks · updated every 5 seconds</p></div><div class="filter-wrap"><label class="search"><svg class="icon"><use href="#i-search"/></svg><input id="search" placeholder="Filter projects…" autocomplete="off" aria-label="Filter projects" /></label></div></div>
             <div class="filter-row" role="group" aria-label="Filter by status"><button class="filter active" type="button" data-filter="all">All</button><button class="filter" type="button" data-filter="active">Active</button><button class="filter" type="button" data-filter="inactive">Inactive</button><button class="filter" type="button" data-filter="attention">Attention</button></div>
             <div id="project-grid" class="project-grid"><div class="loading-panel">Reading project configuration…</div></div>
           </section>
