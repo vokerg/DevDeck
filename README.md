@@ -2,6 +2,10 @@
 
 A local, **terminal-first flight deck** for a developer juggling multiple projects on **Windows and macOS**. DevDeck monitors what is actually running, shows each repo's local Git state, and opens the **native PowerShell or Terminal.app** for explicitly configured Start, Pull, Codex, and Shell actions. It does not take ownership of processes or silently run commands.
 
+## Agent handoff
+
+Opening DevDeck in Codex or another local coding agent? Start at **[AGENTS.md](AGENTS.md)** for the authoritative reading order, design/safety invariants, tests, branch/PR workflow and owner-controlled squash merge. The [documentation index](docs/README.md) links the architecture, JSON configuration, development and decisions guides. Agents should create reviewable branches and **must not merge without explicit authorization**.
+
 ## Quick start
 
 Requires **Node.js 20+**, npm, and Git. No runtime npm packages are needed.
