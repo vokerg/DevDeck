@@ -35,6 +35,8 @@ DevDeck **does not own** service PIDs, process lifetimes or logs. A service star
 | **config/** | Bundled repository registry and copyable examples | Values are examples, not discovered local installations |
 | **test/** | Contract tests for config, status, actions, Git, HTTP and command quoting | Actual OS GUI operation needs real-machine testing |
 
+The dashboard uses one compact overview panel for branding, the local platform, refresh status and aggregate counts. Projects occupy the full content width below it; there is no machine navigation sidebar. Search and status filters apply to the project cards while overview counts describe the entire registry.
+
 ## HTTP routes
 
 - **GET /api/health** returns an object with **ok: true**.
