@@ -62,7 +62,10 @@ export async function probeService(service, processSnapshot = null, context = {}
   }
   if (health.type === 'http') {
     const good = await httpIsHealthy(health.url, health.contains);
-    if (good) return { status: 'running', detail: `HTTP responds at ${health.url} (identity not verified)` };
+    if (good) return {
+      status: 'running',
+      detail: `HTTP responds at ${health.url} (${health.contains ? 'signature verified' : 'identity not verified'})`
+    };
     const u = new URL(health.url);
     const port = Number(u.port) || (u.protocol === 'https:' ? 443 : 80);
     if (await portIsOpen(port, u.hostname.replace(/^\[|\]$/g, ''))) return { status: 'occupied', detail: `Port ${port} is open but the expected health response was not found${health.contains ? ` (needs: ${health.contains})` : ''}` };

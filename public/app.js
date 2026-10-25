@@ -11,7 +11,7 @@ function validUrl(input) { try {const u = new URL(input);return ['http:','https:
 const canLaunch = () => ['win32','darwin'].includes(state.platform);
 const eligible = s => (s.status === 'stopped' || (s.status === 'unknown' && s.unmonitored)) && !!s.command;
 function actionButton(p, action, label, title, { klass='secondary-action', target='', kind='', disabled=false, glyph='play' } = {}) {
-  return `<button type="button" class="${klass}" data-project="${esc(p.id)}" data-action="${esc(action)}" ${target ? `data-target="${esc(target)}" data-kind="${esc(kind)}"` : ''} title="${esc(title)}" ${disabled || !canLaunch() || state.pending ? 'disabled' : ''}>${icon(glyph)}<span>${esc(label)}</span></button>`;
+  return `<button type="button" class="${klass}" data-project="${esc(p.id)}" data-action="${esc(action)}" ${target ? `data-target="${esc(target)}" data-kind="${esc(kind)}"` : ''} title="${esc(title)}" aria-label="${esc(label)}" ${disabled || !canLaunch() || state.pending ? 'disabled' : ''}>${icon(glyph)}<span>${esc(label)}</span></button>`;
 }
 function serviceRow(p, s) {
   const url = validUrl(s.url);
@@ -20,7 +20,7 @@ function serviceRow(p, s) {
     <div class="service-identity"><div class="service-indicator ${color(s.status)}"></div><div class="service-title"><strong>${esc(s.name)}</strong><small title="${esc(s.detail)}">${esc(details || s.detail)}</small><span class="service-command" title="${esc(s.command || 'No command for this OS')}">${esc(s.command || 'Unavailable on this OS')}</span></div></div>
     <div class="service-tools">${badge(s.status)}
       ${url ? `<a class="service-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="Open ${esc(url)}">${icon('arrow')}<span>Open</span></a>` : ''}
-      ${url ? `<button type="button" class="service-copy" data-copy="${esc(url)}" title="Copy URL">${icon('copy')}</button>` : ''}
+      ${url ? `<button type="button" class="service-copy" data-copy="${esc(url)}" title="Copy URL" aria-label="Copy ${esc(url)}">${icon('copy')}</button>` : ''}
       ${actionButton(p,'start','Start',eligible(s) ? `Launch ${s.command} in a native terminal${s.unmonitored ? ' (service has no health check)' : ''}` : `Cannot start: ${s.detail}`,{klass:'service-start',target:s.id,kind:'services',disabled:!eligible(s) || !p.exists,glyph:'play'})}
     </div>
   </div>`;
