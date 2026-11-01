@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { loadConfig, commandForPlatform, getServiceCwd } from '../server/config.js';
+import { loadConfig, commandForPlatform, getServiceCwd, validateConfig } from '../server/config.js';
 
 async function withConfig(value, callback) {
   const root = await mkdtemp(path.join(tmpdir(), 'devdeck-test-'));
@@ -91,4 +91,14 @@ test('bundled registry keeps priority projects first and validates their launch 
     ['web', 'api'],
     ['web', 'api', 'worker']
   ]);
+});
+
+
+test('Stop signatures are explicit and distinctive', () => {
+  for (const stop of [{}, {matches:[]}, {matches:['node']}, {matches:[42]}, {matches:'scripts/dev.mjs'}]) {
+    const config=structuredClone(basic);config.projects[0].stop=stop;
+    assert.throws(()=>validateConfig(config), /stop.matches/);
+  }
+  const config=structuredClone(basic);config.projects[0].stop={matches:['node scripts/dev.mjs']};
+  assert.equal(validateConfig(config),config);
 });

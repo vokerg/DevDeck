@@ -17,7 +17,7 @@ Treat executable code and tests as the current behavioral authority. If document
 ## Product and safety invariants
 
 - **Observe reality, not launch history.** Services started in an IDE or separate shell must be discoverable by configured health checks.
-- **Visible native terminals only.** Start, Pull, Shell and Codex launch PowerShell on Windows or Terminal.app on macOS. Do not silently run, kill, restart or supervise project processes; stopping belongs in their original terminals.
+- **Visible native terminals only.** Start, Pull, Shell and Codex launch PowerShell on Windows or Terminal.app on macOS. Do not silently run, kill, restart or supervise project processes. Prefer stopping in original terminals; an explicit confirmed macOS Stop may send SIGTERM only to configured, repository-verified launchers and their verified descendants. Never force-kill or infer ownership from a port.
 - **Static trusted JSON.** Registered roots, commands, health checks, URLs and launch profiles come from validated configuration. No automatic repo detection, browser-supplied shell command or write-back configuration UI.
 - **Conservative health.** An open TCP port does not prove identity. Wrong HTTP response means occupied; unverifiable worker means unknown; ambiguous shared ports mean conflict. Do not reinterpret uncertainty as stopped.
 - **Safe launch planning.** Combined launch profiles declare every service one CLI command starts. Never start a profile unless all included services are confirmed stopped. Preserve per-service autostart opt-out, status re-checks and the 12-second cooldown.
@@ -48,7 +48,7 @@ curl http://localhost:4400/api/health
 curl http://localhost:4400/api/projects
 ~~~
 
-PowerShell supports **Invoke-RestMethod http://localhost:4400/api/health**. Running status checks is safe; clicking Start/Pull/Codex is not a passive smoke test and may perform configured side effects.
+PowerShell supports **Invoke-RestMethod http://localhost:4400/api/health**. Running status checks is safe; confirming Stop or clicking Start/Pull/Codex is not a passive smoke test and may perform configured side effects.
 
 ## Completion standard
 

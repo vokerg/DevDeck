@@ -81,6 +81,11 @@ export function validateConfig(data) {
     nonEmpty(p.name, `${p.id}.name`);
     osValue(p.path, `${p.id}.path`);
     if (!Array.isArray(p.services)) throw new Error(`${p.id}.services must be an array`);
+    if (p.stop != null) {
+      if (!p.stop || !Array.isArray(p.stop.matches) || !p.stop.matches.length || p.stop.matches.some(m => typeof m !== 'string' || m.trim().length < 5)) {
+        throw new Error(`${p.id}.stop.matches must contain distinctive command signatures (at least five characters)`);
+      }
+    }
     const serviceIds = new Set();
     for (const s of p.services) checkService(s, p.id, serviceIds);
     if (p.launchers != null && !Array.isArray(p.launchers)) throw new Error(`${p.id}.launchers must be an array`);

@@ -44,6 +44,7 @@ function card(p) {
     <div class="services-list">${p.services.length ? p.services.map(s => serviceRow(p,s)).join('') : `<div class="empty-services">${icon('gear')}<span>No services configured. Add them in <code>config/projects.json</code>.</span></div>`}</div>
     ${launchers}
     <div class="project-actions">${actionButton(p,'start-stopped','Start stopped','Start a preferred group when all included services are stopped, then other stopped services individually',{klass:'primary-action',disabled:!p.exists || !stopped,glyph:'play'})}<div class="secondary-actions">
+      ${actionButton(p,'stop-preview','Stop',state.platform !== 'darwin' ? 'Graceful Stop is supported on macOS only' : !p.stopConfigured ? 'Configure stop.matches to identify a trusted launcher' : 'Preview verified processes and request graceful shutdown',{disabled:!p.exists || !p.stopConfigured || state.platform !== 'darwin',glyph:'terminal'})}
       ${actionButton(p,'shell','Shell','Open repository terminal',{disabled:!p.exists,glyph:'terminal'})}
       ${actionButton(p,'pull','Pull','Open git pull --ff-only in native terminal',{disabled:!p.exists,glyph:'pull'})}
       ${actionButton(p,'codex','Codex','Open Codex CLI in repository terminal',{disabled:!p.exists,glyph:'code'})}
@@ -97,6 +98,16 @@ async function runAction(button) {
   try {
     const r = await fetch(endpoint,{method:'POST',headers:{'X-DevDeck-Action':'1'}}), payload = await r.json();
     if (!r.ok) throw Error(payload.error || 'Launch failed');
+    if (action === 'stop-preview') {
+      const description = payload.processes.map(p => `PID ${p.pid}: ${p.command}\n  ${p.cwd}`).join('\n\n');
+      if (!window.confirm(`Stop ${state.projects.find(p => p.id === project)?.name || project}?\n\n${description}\n\nSend SIGTERM to these processes, launcher first. No force-kill. Other separately launched services may remain running.`)) return;
+      const stopped = await fetch(`/api/projects/${encodeURIComponent(project)}/stop`, {method:'POST', headers:{'X-DevDeck-Action':'1','X-DevDeck-Stop-Token':payload.token}});
+      const result = await stopped.json();
+      if (!stopped.ok) throw Error(result.error || 'Stop failed');
+      toast(result.message);
+      await refresh();
+      return;
+    }
     toast(payload.message);
     setTimeout(refresh,1300);
   } catch(e) { toast(e.message,true); }

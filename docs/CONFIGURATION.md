@@ -117,3 +117,16 @@ OS-keyed commands and paths can have keys **win32**, **darwin**, **linux**, **de
 The bundled registry covers **personal_context_engine** (React/Vite 4310 / Fastify API 3110 / optional worker; **npm run dev:local** combined launcher), **sportos** (Angular 4210 / API 3010 / worker; **pnpm run dev** combined launcher), **nba_time_machine** (Vite 5173 / FastAPI 8000 / macOS **python3 dev.py** combined launcher), **WhyISuckAtChess** (Angular 4200 / API 3000 / worker; **npm run dev** for web/API and **npm run dev:all** for all three) and **chess_repertoir_trainer** (Angular 4200 / API 3000 / worker; **npm run dev** for web/API, optional Expo). These values reflect the repos' documented defaults and this machine's configured local ports, not an auto-detected runtime scan. To run both chess apps together, first change their own conflicting ports and then update the DevDeck registry accordingly.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for status certainty and [DECISIONS.md](DECISIONS.md) for why automatic discovery/config editing is excluded.
+
+
+## Graceful Stop configuration (macOS)
+
+An optional project-level entry enables the Stop button:
+
+~~~json
+"stop": { "matches": ["node scripts/dev.mjs"] }
+~~~
+
+Use a distinctive substring of the **actual launcher process command line**, not the shell command used to start it. Every match must have at least five characters. These are trusted executable configuration: choose narrowly. SportOS declares `node scripts/dev.mjs`; Personal Context Engine declares `node scripts/local-dev.mjs`. Copy these into an existing ignored local override if you use one; the bundled registry does not override that file.
+
+Stop finds same-user matching launchers with canonical cwd inside the project, includes descendants only when every cwd is verifiable inside that repository, and previews the entire selection. It never walks up to a shell or editor. Confirmation expires after 60 seconds and is invalidated if config or processes change. SIGTERM goes to launchers first, then remaining previewed descendants after an identity recheck if their launcher has exited. A launcher still shutting down retains control of its children. A surviving or newly spawned process is never force-killed. Separately launched web/API/worker processes outside the configured launcher tree are untouched and may remain active. Stop is disabled without signatures and on Windows/Linux.
