@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { loadConfig } from './config.js';
 import { getProjectStatuses } from './status.js';
 import { createActions } from './actions.js';
+import { createStopActions } from './stop.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ASSETS = path.join(ROOT, 'public');
@@ -21,7 +22,7 @@ export function isSafeRequest(req, port) {
   if (origin && !localHosts.some(h => origin === `http://${h}`)) return false;
   return !['cross-site'].includes(req.headers['sec-fetch-site']);
 }
-export function createHandler({ port = 4400, config = loadConfig, statuses = getProjectStatuses, actions = createActions() } = {}) {
+export function createHandler({ port = 4400, config = loadConfig, statuses = getProjectStatuses, actions = createActions(), stopActions = createStopActions() } = {}) {
   return async (req, res) => {
     try {
       if (!isSafeRequest(req, port)) return json(res, 403, { error: 'Requests must originate from this local DevDeck dashboard' });
@@ -33,6 +34,11 @@ export function createHandler({ port = 4400, config = loadConfig, statuses = get
       }
       if (req.method === 'POST' && url.pathname.startsWith('/api/projects/')) {
         if (req.headers['x-devdeck-action'] !== '1') return json(res, 403, { error: 'Missing DevDeck action header' });
+        const stopRoute = url.pathname.match(/^\/api\/projects\/([a-z0-9-]+)\/(stop-preview|stop)$/);
+        if (stopRoute) {
+          const result = await stopActions(await config(), stopRoute[1], stopRoute[2], req.headers['x-devdeck-stop-token']);
+          return json(res, result.code || 200, result.code ? { error: result.message } : result);
+        }
         // The browser can request only named actions and IDs; commands come exclusively from disk config.
         const route = url.pathname.match(/^\/api\/projects\/([a-z0-9-]+)\/(services|launchers)\/([a-z0-9-]+)\/(start|launch)$/);
         const projectRoute = url.pathname.match(/^\/api\/projects\/([a-z0-9-]+)\/(start-stopped|pull|codex|shell)$/);

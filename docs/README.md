@@ -23,4 +23,4 @@ When code, test and documentation disagree, investigate and correct the mismatch
 
 DevDeck observes **only the machine where its local Node server runs**. It is neither a remote admin service nor a process supervisor. Its actions open native user-visible CLI sessions. Workers, databases, installers and unrelated terminals are not owned by DevDeck.
 
-The current application intentionally has no automatic repository discovery, no dynamic config editor, no background Git synchronization, and no stop/kill/restart button. See [DECISIONS.md](DECISIONS.md).
+The current application intentionally has no automatic repository discovery, no dynamic config editor, no background Git synchronization, and no force-kill/restart button. Explicit macOS graceful Stop is available for configured verified launcher trees after preview and confirmation (D08). See [DECISIONS.md](DECISIONS.md).

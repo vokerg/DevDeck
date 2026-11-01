@@ -163,7 +163,7 @@ export async function getProjectStatuses(config, options = {}) {
       id: l.id, name: l.name, command: commandForPlatform(l.command), cwd: l.cwd || '.', services: l.services, preferred: !!l.preferred,
       cwdExists: exists && await access(getServiceCwd(root, l)).then(() => true).catch(() => false)
     })));
-    return { id: p.id, name: p.name, description: p.description || '', root, exists, services, launchers, git: exists && options.git !== false ? await gitStatus(root) : null, status: 'stopped', activeCount: 0 };
+    return { id: p.id, name: p.name, description: p.description || '', root, exists, services, launchers, stopConfigured: !!p.stop, git: exists && options.git !== false ? await gitStatus(root) : null, status: 'stopped', activeCount: 0 };
   }));
   return applyPortConflicts(projects);
 }

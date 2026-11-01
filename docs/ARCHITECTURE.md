@@ -30,6 +30,7 @@ DevDeck **does not own** service PIDs, process lifetimes or logs. A service star
 | **server/status.js** | Best-effort health checks, process snapshots, ambiguous-port detection and aggregate status | TCP listening is not proof of project identity |
 | **server/git.js** | Read-only branch, dirty and ahead/behind via local Git status | No implicit fetch or mutations |
 | **server/actions.js** | Resolve registered action, re-probe services, prefer launchers, apply 12-second cooldown | No duplicate/ambiguous bulk startups |
+| **server/stop.js** | macOS process preview, repository/ancestry/identity checks, single-use confirmation and SIGTERM | Only trusted configured signatures; no port-based ownership, force-kill or automatic restart |
 | **server/terminal.js** | Build shell command with path quoting and open a visible native terminal | Use PowerShell on Windows, Terminal.app on macOS |
 | **public/** | Browser dashboard, links, search/filter and explicit action clicks | UI state is a snapshot, not an authority |
 | **config/** | Bundled repository registry and copyable examples | Values are examples, not discovered local installations |
@@ -44,6 +45,8 @@ The dashboard uses one compact overview panel for branding, the local platform, 
 - **POST /api/projects/:id/services/:serviceId/start** launches one service when safe.
 - **POST /api/projects/:id/launchers/:launcherId/launch** launches one combined profile only if every mapped service is confirmed stopped.
 - **POST /api/projects/:id/start-stopped** launches compatible profiles first, then eligible individual stopped services; respects **autostart: false**.
+- **POST /api/projects/:id/stop-preview** returns verified PIDs, commands and cwd plus a single-use 60-second token (macOS, explicit `stop.matches` required).
+- **POST /api/projects/:id/stop** requires that token in **x-devdeck-stop-token**; revalidates config and process identities, then requests SIGTERM parent first. Returns requested signal count, remaining verified processes and signal errors; service health must still be refreshed.
 - **POST /api/projects/:id/pull**, **/codex**, **/shell** opens a terminal rooted at that configured repository.
 
 POST actions require the existing **x-devdeck-action: 1** header and origin/host checks. Registered config determines commands; user-supplied commands are not accepted. These protections assume a local-only deployment, **not** a secure network-facing execution API.
@@ -73,7 +76,7 @@ HTTP checks allow a **contains** signature such as a unique HTML title. This is 
 - **Start stopped** prefers the configured preferred profile, then compatible smaller groups, then eligible individual stopped services; optional **autostart: false** services are skipped.
 - **unknown**, **occupied**, **conflict** and **missing** are never signals for blind bulk launch.
 - A **12-second** per-service request cooldown mitigates double-click starts; it is **not** proof of readiness or process ownership.
-- No Stop/Kill/Restart button; end the process in its terminal.
+- Prefer Ctrl+C in the original terminal. Explicit macOS Stop is the D08 exception: preview and confirm a configured launcher tree, then request SIGTERM. No force-kill/restart.
 
 ## Platform and security limits
 

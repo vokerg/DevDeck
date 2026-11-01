@@ -30,6 +30,7 @@ On Windows PowerShell use **Invoke-RestMethod http://localhost:4400/api/health**
 | Start, launch profiles, cooldown, Git/Codex actions | **server/actions.js** | **test/actions.test.js** |
 | PowerShell and macOS Terminal command construction | **server/terminal.js** | **test/terminal.test.js** |
 | HTTP routing and origin boundary | **server/index.js** | **test/http.test.js** |
+| Graceful Stop | **server/stop.js** | **test/stop.test.js**, including a disposable macOS process integration test |
 | Dashboard | **public/index.html**, **public/app.js**, **public/styles.css** | Add tests for new logic where practical |
 | Bundled config | **config/projects.json**, **config/projects.example.json** | Keep the two examples synchronized |
 
@@ -48,9 +49,11 @@ The automated tests cannot prove native GUI behavior on Linux. When the relevant
 | Worker | External worker may stay **unknown** if cwd cannot be verified | Confirm command + cwd checks when available |
 | Shell, Codex, Pull | Opens native terminal rooted at repo; Pull runs **git pull --ff-only** | Same |
 | Port conflicts | Wrong service on configured port is not treated as target | Same |
-| Shutdown | Ctrl+C in originating terminal; DevDeck does not kill it | Same |
+| Shutdown | Ctrl+C in originating terminal; Stop disabled | Ctrl+C, or preview and confirm SIGTERM for a configured verified launcher tree |
 
-Use **disposable repositories** when testing Git Pull or commands with side effects. A successful terminal-open API response does not guarantee an app started; read terminal output. Do not claim Windows/macOS integration was tested when running only in Linux/CI. Record the tested OS and observed behavior.
+Use **disposable repositories** when testing Git Pull or commands with side effects. Stop checks must use disposable processes: preview/cancel must have no effects; confirmation sends SIGTERM parent first; changed identity/config, expired tokens and external descendants must refuse. Check that survivors remain visible and no force-kill occurs. Never use real projects as a passive Stop smoke test. Windows graceful Stop is not implemented and the button is disabled.
+
+A successful terminal-open API response does not guarantee an app started; read terminal output. Do not claim Windows/macOS integration was tested when running only in Linux/CI. Record the tested OS and observed behavior.
 
 ## Feature branch → PR → authorized squash merge
 

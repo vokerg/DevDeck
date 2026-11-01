@@ -4,7 +4,7 @@ These decisions are intentional product boundaries, not an invitation to turn De
 
 ## D01 — Visible native terminal is the execution interface
 
-**Decision:** Start, Shell, Pull and Codex open configured commands in PowerShell or Terminal.app. DevDeck does not silently own service processes, stream logs or kill/restart apps.
+**Decision:** Start, Shell, Pull and Codex open configured commands in PowerShell or Terminal.app. DevDeck does not silently own service processes, stream logs, force-kill or restart apps. The owner-approved exception is an explicit, previewed and confirmed graceful macOS Stop (D08).
 
 **Reason:** The developer wants a flight deck over their existing CLI workflow, not hidden magic. Terminal output, prompts and Ctrl+C remain where they started.
 
@@ -60,6 +60,15 @@ These decisions are intentional product boundaries, not an invitation to turn De
 
 ## Deferred unless the owner explicitly asks
 
-Automatic repository discovery; dynamic config editing; background supervision, restart, killing or log capture; remote launch; machine-to-machine synchronization; automatic Docker/Postgres provisioning; hidden Git changes; accepting arbitrary HTTP shell commands.
+Automatic repository discovery; dynamic config editing; background supervision, restart, force-killing or log capture; remote launch; machine-to-machine synchronization; automatic Docker/Postgres provisioning; hidden Git changes; accepting arbitrary HTTP shell commands.
 
 Any proposal to cross one of these boundaries must explain command visibility, ownership, failure cases and trust/security implications before changing code.
+
+
+## D08 — Explicit graceful Stop for verified launchers (owner approved)
+
+**Decision:** macOS projects may declare distinctive `stop.matches` command signatures in trusted JSON. Stop previews matching same-user launchers whose canonical cwd is in the repository, plus all descendants. Every descendant must also be repository verified; otherwise the entire preview is refused. Confirming a server-issued, single-use token within 60 seconds rechecks configuration and the complete process plan before SIGTERM. No browser-supplied PID, command, signal or path is accepted.
+
+**Reason:** detached development launchers can remain alive with no visible terminal. SIGTERM gives launchers a standard graceful shutdown request and lets them shut down children without restarting them.
+
+**Implication:** signal parents first, allow a brief grace period, and recheck PID/start time/command/cwd immediately before each remaining signal. Do not signal children while their configured launcher is still running; allow its shutdown handler to finish. Ancestors of DevDeck and other unrelated processes are excluded. This is best-effort OS process identity checking, not an atomic guarantee against PID reuse. No force-kill, automatic restart, port-based killing or background supervision. A process can ignore SIGTERM; remaining processes and normal service probes report reality. Independently started services outside the configured launcher tree remain untouched. Windows Stop remains disabled until a graceful platform-specific mechanism exists; Linux stays observation only.

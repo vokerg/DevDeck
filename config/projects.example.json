@@ -7,6 +7,7 @@
   "projects": [
     {
       "id": "personal-context-engine",
+      "stop": { "matches": ["node scripts/local-dev.mjs"] },
       "name": "Personal Context Engine",
       "path": "personal_context_engine",
       "description": "React/Vite reader, Fastify API and optional worker",
@@ -69,6 +70,7 @@
     },
     {
       "id": "sportos",
+      "stop": { "matches": ["node scripts/dev.mjs"] },
       "name": "SportOS",
       "path": "sportos",
       "description": "Sports data cockpit with Angular, API and worker",

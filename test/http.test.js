@@ -15,6 +15,7 @@ async function withApi(fn) {
     port,
     config: async () => ({ projects: [], baseDirs: {} }),
     statuses: async () => [],
+    stopActions: async (...args) => { calls.push(args); return { message: 'stop preview', token: 'server-token', processes: [] }; },
     actions: async (...args) => { calls.push(args); return { message: 'launched', launched: 1 }; }
   });
   const request = async (method, url, headers = {}) => {
@@ -48,5 +49,19 @@ test('API dispatches only registered action shapes and not arbitrary browser com
     assert.equal((await request('POST', '/api/projects/demo/services/api/codex', actionHeaders)).status, 404);
     assert.equal((await request('POST', '/api/projects/demo/exec?command=rm%20-rf%20.', actionHeaders)).status, 404);
     assert.deepEqual(calls.map(x => x.slice(1)), [['demo','launch','full'],['demo','start','api'],['demo','codex']]);
+  });
+});
+
+
+test('Stop routes retain host/origin/action checks and pass only server token and project ID', async () => {
+  await withApi(async (request,calls) => {
+    const url='/api/projects/demo/stop-preview';
+    assert.equal((await request('GET',url)).status,404);
+    assert.equal((await request('POST',url)).status,403);
+    assert.equal((await request('POST',url,{'X-DevDeck-Action':'1',Origin:'http://evil.example'})).status,403);
+    assert.equal(calls.length,0);
+    assert.equal((await request('POST',url,{'X-DevDeck-Action':'1'})).json.token,'server-token');
+    assert.equal((await request('POST','/api/projects/demo/stop?pid=1',{'X-DevDeck-Action':'1','X-DevDeck-Stop-Token':'server-token'})).status,200);
+    assert.deepEqual(calls.map(c=>c.slice(1)),[['demo','stop-preview',undefined],['demo','stop','server-token']]);
   });
 });
