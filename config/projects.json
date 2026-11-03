@@ -363,6 +363,33 @@
       "path": "voktrader",
       "description": "Not configured yet",
       "services": []
+    },
+    {
+      "id": "vps-project",
+      "name": "VPS Worker Console",
+      "path": "vps_project",
+      "description": "Local worker metrics and controls; requires Python 3.10+ and authenticated gcloud.",
+      "services": [
+        {
+          "id": "console",
+          "name": "Worker console",
+          "role": "frontend",
+          "cwd": ".",
+          "command": {
+            "darwin": "python3 projects/gcp/free-tier/tools/worker-console/server.py",
+            "win32": "py -3 projects/gcp/free-tier/tools/worker-console/server.py",
+            "linux": "python3 projects/gcp/free-tier/tools/worker-console/server.py"
+          },
+          "port": 8787,
+          "url": "http://127.0.0.1:8787/",
+          "health": {
+            "type": "http",
+            "url": "http://127.0.0.1:8787/",
+            "contains": "<title>Worker console</title>"
+          },
+          "autostart": false
+        }
+      ]
     }
   ]
 }
