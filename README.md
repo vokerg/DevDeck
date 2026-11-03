@@ -18,7 +18,7 @@ npm run dev
 
 Open **http://localhost:4400**. `npm run dev` watches the Node server; `npm start` runs normally and `npm test` runs the automated tests. The server binds only to `127.0.0.1`.
 
-**First edit:** set `baseDirs.win32` and `baseDirs.darwin` in `config/projects.json` to where your repositories live on each machine. The committed configuration includes examples for Personal Context Engine, SportOS, DevDeck, `nba_time_machine`, `WhyISuckAtChess`, `chess_repertoir_trainer`, and the local VPS Worker Console; it also contains unconfigured placeholders for Garmin Heatmap and Voktrader. These are *examples*, not auto-detected installations. Verify actual commands, ports and locations on each computer.
+**First edit:** set `baseDirs.win32` and `baseDirs.darwin` in `config/projects.json` to where your repositories live on each machine. The committed configuration includes examples for Personal Context Engine, SportOS, DevDeck, `nba_time_machine`, `WhyISuckAtChess`, `chess_repertoir_trainer`, and the local VPS Worker Console. These are *examples*, not auto-detected installations. Verify actual commands, ports and locations on each computer.
 
 To keep machine-specific configuration out of Git, copy `config/projects.json` to `config/projects.local.json` (which is gitignored), edit it, then launch with `DEVDECK_CONFIG=config/projects.local.json npm run dev` on macOS or `$env:DEVDECK_CONFIG='config/projects.local.json'; npm run dev` in PowerShell. The dashboard does not edit configuration; changes to the JSON are picked up on the next 5-second refresh.
 
