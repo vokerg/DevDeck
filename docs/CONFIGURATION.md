@@ -130,3 +130,28 @@ An optional project-level entry enables the Stop button:
 Use a distinctive substring of the **actual launcher process command line**, not the shell command used to start it. Every match must have at least five characters. These are trusted executable configuration: choose narrowly. SportOS declares `node scripts/dev.mjs`; Personal Context Engine declares `node scripts/local-dev.mjs`. Copy these into an existing ignored local override if you use one; the bundled registry does not override that file.
 
 Stop finds same-user matching launchers with canonical cwd inside the project, includes descendants only when every cwd is verifiable inside that repository, and previews the entire selection. It never walks up to a shell or editor. Confirmation expires after 60 seconds and is invalidated if config or processes change. SIGTERM goes to launchers first, then remaining previewed descendants after an identity recheck if their launcher has exited. A launcher still shutting down retains control of its children. A surviving or newly spawned process is never force-killed. Separately launched web/API/worker processes outside the configured launcher tree are untouched and may remain active. Stop is disabled without signatures and on Windows/Linux.
+
+
+## Local VPS Worker Console example
+
+Both bundled registries include `vps-project`, rooted at the relative checkout
+`vps_project`. Its single `console` service explicitly runs
+`python3 projects/gcp/free-tier/tools/worker-console/server.py` on macOS/Linux
+and `py -3 projects/gcp/free-tier/tools/worker-console/server.py` on Windows.
+The loopback URL and HTTP probe use `http://127.0.0.1:8787/`, with the literal
+`<title>Worker console</title>` signature. Use 127.0.0.1, since that console
+validates Host strictly. Python 3.10+ and an already configured/authenticated
+Google Cloud CLI are prerequisites. No cloud identifiers or credentials belong
+in the DevDeck registry.
+
+`autostart: false` keeps cloud-reading UI startup manual. DevDeck observes only
+the local console HTTP service and opens its normal start command; the console
+owns remote reads and explicit worker actions. No remote service entries,
+new DevDeck action types or stop signatures are added. Use Ctrl+C in the
+console terminal to close it. Copy the entry to `projects.local.json` if that
+ignored override is active; it is a replacement registry, not an overlay.
+
+Validation on macOS: both bundled registries and the local override parse with
+the existing validator. Full automated tests and local HTTP status checks were
+run for the registration. Native Start through DevDeck and Windows launch were
+not exercised; this registration does not change terminal-launch code.

@@ -18,7 +18,7 @@ npm run dev
 
 Open **http://localhost:4400**. `npm run dev` watches the Node server; `npm start` runs normally and `npm test` runs the automated tests. The server binds only to `127.0.0.1`.
 
-**First edit:** set `baseDirs.win32` and `baseDirs.darwin` in `config/projects.json` to where your repositories live on each machine. The committed configuration includes examples for Personal Context Engine, SportOS, DevDeck, `nba_time_machine`, `WhyISuckAtChess`, and `chess_repertoir_trainer`; it also contains unconfigured placeholders for Garmin Heatmap and Voktrader. These are *examples*, not auto-detected installations. Verify actual commands, ports and locations on each computer.
+**First edit:** set `baseDirs.win32` and `baseDirs.darwin` in `config/projects.json` to where your repositories live on each machine. The committed configuration includes examples for Personal Context Engine, SportOS, DevDeck, `nba_time_machine`, `WhyISuckAtChess`, `chess_repertoir_trainer`, and the local VPS Worker Console; it also contains unconfigured placeholders for Garmin Heatmap and Voktrader. These are *examples*, not auto-detected installations. Verify actual commands, ports and locations on each computer.
 
 To keep machine-specific configuration out of Git, copy `config/projects.json` to `config/projects.local.json` (which is gitignored), edit it, then launch with `DEVDECK_CONFIG=config/projects.local.json npm run dev` on macOS or `$env:DEVDECK_CONFIG='config/projects.local.json'; npm run dev` in PowerShell. The dashboard does not edit configuration; changes to the JSON are picked up on the next 5-second refresh.
 
@@ -78,6 +78,22 @@ All project definitions are in a **static JSON file**. No repository scanning, g
 | `chess_repertoir_trainer` | Angular `:4200` | Fastify `:3000` | `npm run dev:worker` | `npm run dev` (web+API) | Expo `npm run dev:mobile` at `:8081` is optional/manual. |
 
 The two chess projects **share default ports**. DevDeck checks their different HTML `<title>` content to identify the web frontend, and refuses duplicate/conflicting starts. **Do not run both on the same ports** without changing their own configuration and then updating DevDeck's URLs and health checks. API URLs and ports in the shipped JSON reflect the documented defaults, not guaranteed installed settings.
+
+## VPS Worker Console
+
+The registry includes **VPS Worker Console** (`vps_project`) at
+**http://127.0.0.1:8787/**. Its Start action opens the Python console in a visible
+terminal; Open navigates to its own UI. Python 3.10+ and authenticated `gcloud`
+are required, with the target and pinned SSH setup configured in that private
+operations checkout. The example uses `python3` on macOS/Linux and `py -3` on
+Windows; verify your local interpreter and cloud configuration first.
+
+It is excluded from bulk startup (`autostart: false`). DevDeck's HTTP check
+matches the console page title and reports whether the **local console** is
+serving; it does not authenticate to GCP or report remote worker health.
+Individual remote-worker controls belong to that console. Ctrl+C in its terminal
+closes the console without stopping remote workers. If using the ignored local
+registry, add the same entry there; bundled config does not override it.
 
 ## Safety model
 
