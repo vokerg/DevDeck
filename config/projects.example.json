@@ -351,20 +351,6 @@
       ]
     },
     {
-      "id": "garmin-heatmap",
-      "name": "Garmin Heatmap",
-      "path": "GarminHeatmap",
-      "description": "Not configured yet",
-      "services": []
-    },
-    {
-      "id": "voktrader",
-      "name": "Voktrader",
-      "path": "voktrader",
-      "description": "Not configured yet",
-      "services": []
-    },
-    {
       "id": "vps-project",
       "name": "VPS Worker Console",
       "path": "vps_project",
